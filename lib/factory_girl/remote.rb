@@ -1,8 +1,10 @@
+require 'rack/remote'
+require 'factory_girl'
 require 'factory_girl/remote/version'
 
 module FactoryGirl
 
-  def remote(uri_or_symbol)
+  def self.remote(uri_or_symbol)
     Remote.new uri_or_symbol
   end
 
@@ -13,13 +15,22 @@ module FactoryGirl
       @remote = remote
     end
 
-    [:create, :build, :attributes_for].each do |name|
-      define_method "#{name}" do |*attrs| send :invoke, name.to_s, attrs end
-      define_method "#{name}_list" do |*attrs| send :invoke, "#{name}_list", attrs end
-    end
-
     def invoke(method, attrs)
       Rack::Remote.invoke self.remote, :factory_girl_remote, attrs
+    end
+
+    class << self
+      private
+      def define_invoke_method(name)
+        define_method name do |*attrs|
+          send :invoke, name, attrs
+        end
+      end
+    end
+
+    [:create, :build, :attributes_for].each do |name|
+      define_invoke_method "#{name}"
+      define_invoke_method "#{name}_list"
     end
   end
 end
