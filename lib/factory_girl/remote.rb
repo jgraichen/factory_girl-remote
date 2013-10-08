@@ -16,7 +16,7 @@ module FactoryGirl
     end
 
     def invoke(method, attrs)
-      Rack::Remote.invoke self.remote, :factory_girl_remote, attrs
+      Rack::Remote.invoke self.remote, :factory_girl_remote, attrs, { 'Accept' => 'application/json' }
     end
 
     class << self
