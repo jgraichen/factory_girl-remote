@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = %w(lib)
 
-  spec.add_dependency 'rack-remote'
+  spec.add_dependency 'rack-remote', '>= 1.1.0'
   spec.add_dependency 'factory_girl'
 
   spec.add_development_dependency 'bundler'

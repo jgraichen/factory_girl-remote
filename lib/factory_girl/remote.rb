@@ -16,7 +16,7 @@ module FactoryGirl
     end
 
     def invoke(method, attrs)
-      Rack::Remote.invoke self.remote, :factory_girl_remote, attrs.merge(_method: method), { 'Accept' => 'application/json' }
+      Rack::Remote.invoke self.remote, :factory_girl_remote, {method: method, attrs: attrs}, { 'Accept' => 'application/json' }
     end
 
     class << self
@@ -32,14 +32,11 @@ module FactoryGirl
       define_invoke_method "#{name}"
       define_invoke_method "#{name}_list"
     end
+  end
 
-    class << self
-      def init_server
-        Rack::Remote.register :factory_girl_remote do |params, env, request|
-          method = params.delete(:_method) || :create
-          FactoryGirl.send method, *params
-        end
-      end
-    end
+  Rack::Remote.register :factory_girl_remote do |params, env, request|
+    method = params.delete('method') { :create }
+    attrs  = params.delete('attrs') { [] }
+    FactoryGirl.send method, *attrs
   end
 end
